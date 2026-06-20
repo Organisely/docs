@@ -24,23 +24,21 @@
   "navigation": [
     {
       "group": "Getting Started",
-      "pages": [
-        "introduction",
-        "quick-start",
-        "installation"
-      ]
+      "pages": ["introduction", "quick-start", "installation"]
     },
     {
       "group": "Reference",
-      "pages": [
-        "api",
-        "mcp"
-      ]
+      "pages": ["api", "mcp"]
     },
     {
       "group": "SDK",
       "pages": [
         "sdk/overview",
+        "sdk/agents",
+        "sdk/connectors",
+        "sdk/memory",
+        "sdk/events",
+        "sdk/activity",
         "sdk/client",
         "sdk/teams",
         "sdk/analytics",
@@ -51,6 +49,7 @@
   ],
   "footerSocials": {
     "github": "https://github.com/Organisely",
+    "discord": "https://discord.gg/G9NUnYyY2B",
     "website": "https://useorganisely.com"
   },
   "url": "https://organisely.mintlify.app"

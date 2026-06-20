@@ -1,0 +1,90 @@
+---
+title: Events
+description: Subscribe to platform events and emit custom events through the Organisely SDK.
+---
+
+## Subscribe an agent to events
+
+```ts
+await client.subscribe('email-drafter', ['email.received', 'workflow.started'])
+
+// Or using the AgentRunner
+await agent.subscribe(['email.received', 'workflow.started'])
+```
+
+## Emit a custom event
+
+```ts
+await client.emit({
+  name: 'invoice.created',
+  tenantId: 'team_abc',
+  sessionId: 'sess_xyz',
+  payload: { invoiceId: 'inv_001', amount: 4200 },
+})
+```
+
+## Runtime event names
+
+These are the built-in lifecycle events emitted during agent runs:
+
+| Event | Description |
+|---|---|
+| `run.started` | Run has begun |
+| `permission.request` | Tool call awaiting approval |
+| `permission.approved` | Approval granted |
+| `permission.denied` | Approval denied |
+| `execution.receipt` | Run completed with a receipt |
+| `execution.paused` | Run paused (e.g. awaiting approval) |
+| `agent.completed` | Agent handler finished |
+| `run.completed` | Full run finished |
+| `run.failed` | Run failed with error |
+
+## Stream run events
+
+`agent.stream()` returns an async iterable that yields typed runtime events as they occur:
+
+```ts
+const stream = await agent.stream({
+  input: { subject: 'Refund request' },
+  teamId: 'team_abc',
+  sessionId: 'sess_xyz',
+})
+
+for await (const event of stream) {
+  switch (event.name) {
+    case 'permission.request':
+      // prompt user for approval
+      break
+    case 'run.completed':
+      console.log('Done', event.metadata)
+      break
+  }
+}
+
+const { output, receipt } = await stream.result
+```
+
+## Cancel a running stream
+
+```ts
+stream.cancel('User requested cancellation')
+```
+
+## Event shape
+
+Every runtime event includes:
+
+```ts
+{
+  name: string          // event type
+  tenantId: string
+  sessionId: string
+  executionId: string
+  runId: string
+  requestId: string
+  traceId: string
+  correlationId: string
+  timestamp: string     // ISO 8601
+  metadata?: Record<string, unknown>
+}
+```

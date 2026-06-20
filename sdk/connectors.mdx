@@ -1,0 +1,99 @@
+---
+title: Connectors & Connections
+description: Connect external apps and call their tools through Organisely's MCP proxy.
+---
+
+Organisely acts as an **MCP execution gateway**. You connect a connector for a tenant once — Organisely stores credentials, manages OAuth refresh, and proxies all tool calls.
+
+## Connect via OAuth
+
+```ts
+const { connectorId, authUrl } = await client.connect('slack')
+// redirect user to authUrl to complete OAuth
+```
+
+## Connect with a bearer token or API key
+
+```ts
+const { connectorId } = await client.connect.connectWithToken('github', {
+  type: 'bearer',
+  token: 'ghp_...',
+})
+
+// or API key
+const { connectorId } = await client.connect.connectWithToken('notion', {
+  type: 'api-key',
+  token: 'secret_...',
+})
+```
+
+## Connect a custom MCP server URL
+
+```ts
+const { connectorId } = await client.connect.connectUrl({
+  url: 'https://my-custom-mcp.example.com',
+  name: 'my-tool-server',
+  auth: { type: 'bearer', token: 'tok_...' },
+})
+```
+
+## Connect with BYOC (Bring Your Own Credentials)
+
+For OAuth apps where you supply the client ID and secret:
+
+```ts
+const { connectorId, authUrl } = await client.connect.connectBYOC('github', {
+  clientId: 'Iv1...',
+  clientSecret: 'secret...',
+})
+```
+
+## List connections
+
+```ts
+const { connections } = await client.connect.list()
+```
+
+## Discover tools
+
+```ts
+const tools = await client.connect.tools(connectorId)
+// tools: MCPToolEntry[] — name, description, inputSchema
+```
+
+## Call a tool
+
+Organisely proxies the MCP tool call through the stored connection:
+
+```ts
+const result = await client.connect.call(connectorId, 'send_message', {
+  channel: '#general',
+  text: 'Hello from Organisely!',
+})
+```
+
+`execute()` is an alias for `call()`.
+
+## Remove a connection
+
+```ts
+await client.connect.remove(connectorId)
+```
+
+## Connection handle
+
+For a lazily-resolved connection by connector slug:
+
+```ts
+const gh = client.connection('github')
+// pass to agent or use later
+```
+
+## ConnectorsClient vs ConnectionsClient
+
+The SDK exposes two lower-level clients:
+
+- `client.connectors` — raw connector catalog and OAuth operations
+- `client.connections` — connection lifecycle and tool calls
+
+The `client.connect` facade combines the most common operations from both.

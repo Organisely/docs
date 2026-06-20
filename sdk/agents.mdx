@@ -1,0 +1,146 @@
+---
+title: Agents
+description: Define and run agents with the Organisely SDK.
+---
+
+## Define an agent
+
+`client.define(name, config)` returns an `AgentRunner` bound to a named agent identity.
+
+```ts
+const agent = client.define('email-drafter', {
+  model: 'gpt-4.1',
+  provider: 'openai',
+  fallback: ['together-ai'],
+  async handler(event) {
+    const last = await client.memory.get('last_draft')
+    await client.memory.set('last_draft', event.payload.id)
+  },
+})
+```
+
+<ParamField body="name" type="string" required>
+  Agent identifier. Used as the agent key for subscriptions and memory scoping.
+</ParamField>
+
+<ParamField body="config.model" type="string">
+  Model ID. Supports `'auto'`, `'openrouter/auto'`, or any provider model string.
+</ParamField>
+
+<ParamField body="config.provider" type="string">
+  AI provider slug (e.g. `'openai'`, `'anthropic'`, `'together-ai'`).
+</ParamField>
+
+<ParamField body="config.fallback" type="string[]">
+  Ordered list of fallback provider slugs if the primary fails.
+</ParamField>
+
+<ParamField body="config.handler" type="function" required>
+  Async function called for each received event. Receives the event plus `memory.items` and `context`.
+</ParamField>
+
+<ParamField body="config.onError" type="function">
+  Called on errors in `'poll'`, `'handler'`, or `'memory'` contexts.
+</ParamField>
+
+## Subscribe to events
+
+```ts
+await agent.subscribe(['email.received', 'workflow.started'])
+```
+
+## Run the agent
+
+`run()` starts polling for events and calls your handler for each one. It runs until the signal is aborted.
+
+```ts
+const controller = new AbortController()
+await agent.run({ signal: controller.signal })
+
+// Stop the agent
+controller.abort()
+```
+
+## Execute a single run
+
+For a one-shot execution with a specific input:
+
+```ts
+const result = await agent.execute({
+  input: { subject: 'Refund request' },
+  teamId: 'team_abc',
+  sessionId: 'sess_xyz',
+})
+```
+
+## Stream execution events
+
+```ts
+const stream = await agent.stream({
+  input: { subject: 'Refund request' },
+  teamId: 'team_abc',
+})
+
+for await (const event of stream) {
+  console.log(event.name, event.metadata)
+}
+
+const result = await stream.result
+```
+
+## Swarm (multi-agent)
+
+Run multiple agents toward a shared goal:
+
+```ts
+const result = await agent.swarm({
+  agentIds: ['researcher', 'writer', 'reviewer'],
+  goal: 'Produce a market analysis report',
+  teamId: 'team_abc',
+  maxConcurrency: 3,
+})
+```
+
+## Delegate to another agent
+
+```ts
+const result = await agent.delegate({
+  task: 'Summarize this document',
+  toAgentId: 'summarizer',
+  teamId: 'team_abc',
+  context: { doc: '...' },
+})
+```
+
+## Resume a paused run
+
+When a run is paused for approval, resume it with a decision:
+
+```ts
+await agent.resume(receiptId, { approved: true })
+// or deny:
+await agent.resume(receiptId, { approved: false, reason: 'Out of policy' })
+```
+
+## High-level agent builder
+
+`client.createAgent()` and `client.agent()` provide a higher-level agent definition API:
+
+```ts
+const assistant = client.createAgent({
+  name: 'support-assistant',
+  instructions: 'You are a helpful support agent.',
+  memory: { namespace: 'support', retention: 'long_term' },
+})
+```
+
+## Run context
+
+The handler receives a full run context alongside the event:
+
+```ts
+async handler(event) {
+  const { agent_id, run_id, execution_id, correlation_id } = event.context
+  const pastMemory = event.memory.items  // recalled memory entries
+}
+```

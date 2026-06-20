@@ -1,0 +1,51 @@
+---
+title: Activity
+description: Log and query agent activity entries.
+---
+
+Activity entries are structured audit records for agent actions.
+
+## Log an activity entry
+
+```ts
+await client.activity.log({
+  agentId: 'email-drafter',
+  activityType: 'email.processed',
+  tokensUsed: 320,
+  status: 'completed',
+})
+```
+
+<ParamField body="agentId" type="string" required>
+  ID of the agent that performed the activity.
+</ParamField>
+
+<ParamField body="activityType" type="string" required>
+  Dot-namespaced activity type (e.g. `'email.processed'`, `'workflow.triggered'`).
+</ParamField>
+
+<ParamField body="tokensUsed" type="number">
+  Token count consumed by this activity.
+</ParamField>
+
+<ParamField body="status" type="string">
+  `'completed'` | `'failed'` | `'pending'`
+</ParamField>
+
+## List activity entries
+
+```ts
+const { activities } = await client.activity.list({ limit: 50 })
+```
+
+<ParamField query="limit" type="number">
+  Maximum number of entries to return.
+</ParamField>
+
+<ParamField query="agentId" type="string">
+  Filter by agent.
+</ParamField>
+
+<ParamField query="activityType" type="string">
+  Filter by activity type.
+</ParamField>

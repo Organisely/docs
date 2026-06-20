@@ -1,0 +1,117 @@
+---
+title: Memory
+description: Key-value and semantic memory for agent state, scoped by retention and strategy.
+---
+
+The SDK provides two memory surfaces: a simple key-value store on `client.memory`, and a semantic remember/recall system for richer agent context.
+
+## Key-value memory
+
+```ts
+// Set a value
+await client.memory.set('last_draft', draftId, options?)
+
+// Get a value
+const value = await client.memory.get('last_draft', options?)
+
+// Delete a value
+await client.memory.delete('last_draft', options?)
+```
+
+All methods accept an optional `MemoryOptions` context:
+
+```ts
+const opts = {
+  namespace: 'email-drafter',
+  retention: 'session',       // 'session' | 'short_term' | 'long_term'
+  agentId: 'email-drafter',
+  sessionId: 'sess_abc',
+}
+```
+
+## Semantic memory
+
+For storing and retrieving contextual memories by content similarity:
+
+### Remember
+
+```ts
+await client.memory.remember({
+  content: 'Customer prefers invoices sent monthly.',
+  tags: ['billing', 'customer'],
+  namespace: 'support',
+  retention: 'long_term',
+})
+```
+
+### Recall
+
+Retrieves memories by semantic similarity to a query:
+
+```ts
+const { memories } = await client.memory.recall('invoice preferences', {
+  namespace: 'support',
+  limit: 5,
+  retention: 'long_term',
+  strategy: 'semantic',   // 'semantic' | 'recency' | 'hybrid'
+})
+```
+
+### Forget
+
+```ts
+// By IDs
+await client.memory.forget({ ids: ['mem_abc', 'mem_xyz'] })
+
+// By tags
+await client.memory.forget({ tags: ['temp'], namespace: 'support' })
+
+// By time range
+await client.memory.forget({ before: '2025-01-01T00:00:00Z' })
+```
+
+## Memory scopes
+
+For team-scoped memory with fine-grained access control:
+
+```ts
+// Create a scope
+const scope = await client.memory.createScope({
+  teamId: 'team_abc',
+  ownerType: 'agent',
+  ownerId: 'email-drafter',
+  visibility: 'team',
+  namespace: 'shared',
+})
+
+// List scopes
+const { scopes } = await client.memory.listScopes({ teamId: 'team_abc' })
+
+// Delete a scope
+await client.memory.deleteScope(scopeId)
+```
+
+## Retention types
+
+| Retention | Lifetime |
+|---|---|
+| `session` | Cleared after the current session ends |
+| `short_term` | Days to weeks |
+| `long_term` | Persistent across sessions |
+
+## Strategy types
+
+| Strategy | Behaviour |
+|---|---|
+| `semantic` | Retrieve by embedding similarity |
+| `recency` | Retrieve most recent entries |
+| `hybrid` | Combine semantic and recency scoring |
+
+## Agent-level memory
+
+The `AgentRunner` (from `client.define()`) exposes memory pre-scoped to the agent:
+
+```ts
+const support = client.agent('support.email_drafter')
+await support.memory.remember({ content: 'Customer prefers invoices monthly.' })
+```

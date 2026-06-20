@@ -1,89 +1,84 @@
 ---
 title: Agent SDK Overview
-description: The official SDK for building agents on Organisely.
+description: The official SDK for building agents on Organisely — instance-based, fully typed, no global state.
 ---
 
-`@organisely/agent-sdk` is the official SDK for building agents on Organisely.
+`@organisely/agent-sdk` is the official TypeScript SDK for building agents on Organisely. It exposes every platform capability — connectors, memory, events, approvals, activity tracking — through a single instance-based client.
 
-## What this SDK includes
+## Installation
 
-<CardGroup cols={2}>
-  <Card title="Agent definition" icon="robot">
-    Define AI agents with model, provider, and event handlers.
-  </Card>
-  <Card title="Event subscriptions" icon="bell">
-    Subscribe to provider events and poll for delivery.
-  </Card>
-  <Card title="Connector catalog" icon="plug">
-    List connector definitions and available capabilities.
-  </Card>
-  <Card title="Connection management" icon="link">
-    Connect tenant-scoped runtime instances.
-  </Card>
-  <Card title="Tool discovery" icon="search">
-    Discover MCP tools and call them through Organisely's proxy.
-  </Card>
-  <Card title="Memory" icon="database">
-    Key-value session storage for agent state.
-  </Card>
-</CardGroup>
+<CodeGroup>
 
-## Minimal example
+```bash npm
+npm install @organisely/agent-sdk
+```
+
+```bash pnpm
+pnpm add @organisely/agent-sdk
+```
+
+```bash yarn
+yarn add @organisely/agent-sdk
+```
+
+```bash bun
+bun add @organisely/agent-sdk
+```
+
+</CodeGroup>
+
+## Initialize the client
 
 ```ts
-import { OrganiselyAgent } from '@organisely/agent-sdk';
+import { OrganiselyAgent } from '@organisely/agent-sdk'
 
 const client = new OrganiselyAgent({
   baseUrl: 'https://api.useorganisely.com',
   apiKey: process.env.ORGANISELY_API_KEY,
-});
-
-const agent = client.define('email-drafter', {
-  model: 'gpt-4.1',
-  provider: 'openai',
-  async handler(event) {
-    const draft = await draftReply(event.payload.subject);
-    await client.memory.set('last_draft', draft.id);
-  },
-});
-
-await agent.subscribe(['email.received']);
-const controller = new AbortController();
-await agent.run({ signal: controller.signal });
-```
-
-## Connectors and connections
-
-Organisely acts as an **MCP execution gateway**. You connect a connector for a tenant, Organisely stores credentials, manages OAuth, and proxies all MCP tool calls.
-
-```ts
-// Browse available connector definitions
-const { connectors } = await client.connectors.list()
-
-// Connect via hosted OAuth
-const { connectorId, authUrl } = await client.connections.connect(tenantId, 'slack')
-
-// Or with a bearer token
-const { connectorId } = await client.connections.connectWithToken(tenantId, 'github', {
-  type: 'bearer',
-  token: 'ghp_...',
-})
-
-// Or a custom MCP server URL
-const { connectorId } = await client.connections.connectUrl(tenantId, {
-  url: 'https://my-custom-mcp.example.com',
 })
 ```
 
-## Calling tools
+`OrganiselyAgent` is an alias for `Organisely`. Both are identical.
+
+## What the SDK includes
+
+<CardGroup cols={2}>
+  <Card title="Agent definition" icon="robot" href="/sdk/agents">
+    Define agents with model, provider, fallbacks, and an event handler.
+  </Card>
+  <Card title="Connectors & connections" icon="plug" href="/sdk/connectors">
+    Connect external apps via OAuth, bearer token, API key, or custom MCP URL.
+  </Card>
+  <Card title="Memory" icon="database" href="/sdk/memory">
+    Key-value and semantic memory with scoped retention and recall.
+  </Card>
+  <Card title="Events" icon="bolt" href="/sdk/events">
+    Subscribe to platform events, emit custom events, stream execution.
+  </Card>
+  <Card title="Activity" icon="list" href="/sdk/activity">
+    Log and query agent activity entries.
+  </Card>
+  <Card title="Teams & workflows" icon="users" href="/sdk/teams">
+    Manage teams and trigger team-scoped workflows.
+  </Card>
+</CardGroup>
+
+## Authentication options
+
+The client accepts one of three auth shapes:
 
 ```ts
-// Discover tools
-const tools = await client.connections.tools(tenantId, connectorId)
+// API key
+new OrganiselyAgent({ apiKey: 'key_...' })
 
-// Call a tool (Organisely proxies the call)
-const result = await client.connections.call(tenantId, connectorId, 'send_message', {
-  channel: '#general',
-  text: 'Hello!',
+// Short-lived access token
+new OrganiselyAgent({ accessToken: 'eyJ...' })
+
+// Token provider (OAuth rotation)
+new OrganiselyAgent({
+  tokens: {
+    async get() { return { accessToken: await store.read() } },
+    async set(tokens) { await store.write(tokens) },
+  }
 })
 ```
