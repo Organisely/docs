@@ -1,0 +1,39 @@
+---
+title: Error Handling
+description: Handle API errors from the Organisely SDK.
+---
+
+Non-2xx responses throw `OrganiselyApiError`.
+
+## Error fields
+
+<ParamField body="status" type="number">
+  HTTP status code.
+</ParamField>
+
+<ParamField body="payload" type="unknown">
+  Parsed JSON response payload or raw text.
+</ParamField>
+
+<ParamField body="message" type="string">
+  Error message derived from payload when available.
+</ParamField>
+
+## Example
+
+```ts
+import { OrganiselyAgent, OrganiselyApiError } from '@organisely/agent-sdk'
+
+const client = new OrganiselyAgent({
+  apiKey: process.env.ORGANISELY_API_KEY,
+})
+
+try {
+  await client.teams.list()
+} catch (error) {
+  if (error instanceof OrganiselyApiError) {
+    console.error(error.status)
+    console.error(error.payload)
+  }
+}
+```

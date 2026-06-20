@@ -1,0 +1,39 @@
+---
+title: Teams API
+description: List and create teams using the Organisely SDK.
+---
+
+## List teams
+
+```ts
+const result = await client.teams.list()
+```
+
+Response shape:
+
+```ts
+{
+  teams: TeamRecord[]
+}
+```
+
+## Create team
+
+```ts
+const created = await client.teams.create({
+  name: 'Platform Team',
+  description: 'Runtime operators',
+})
+```
+
+<ParamField body="name" type="string" required>
+  Display name for the team.
+</ParamField>
+
+<ParamField body="description" type="string">
+  Optional team description.
+</ParamField>
+
+<ParamField body="image_url" type="string">
+  Optional team avatar URL.
+</ParamField>

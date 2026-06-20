@@ -1,0 +1,36 @@
+---
+title: Client Configuration
+description: Constructor options, authentication, and team scoping for OrganiselyAgent.
+---
+
+## Constructor
+
+```ts
+new OrganiselyAgent({
+  baseUrl?: string,
+  apiKey?: string,
+  headers?: Record<string, string>,
+  apiVersion?: string,
+  fetchImpl?: typeof fetch,
+})
+```
+
+## Behavior
+
+- Defaults `baseUrl` to `https://api.useorganisely.com`
+- Trims trailing slash on `baseUrl`
+- Uses `Authorization: Bearer <apiKey>` when provided
+- Sends/receives JSON automatically
+- Throws `OrganiselyApiError` on non-2xx responses
+
+## Team scoping
+
+```ts
+const team = client.teams.use(teamId)
+```
+
+Team scope exposes:
+
+- `team.workflows`
+- `team.analytics`
+- `team.blueprints` _(compatibility alias for workflows)_

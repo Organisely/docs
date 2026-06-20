@@ -1,0 +1,21 @@
+---
+title: Analytics API
+description: Retrieve team usage and metrics with the Organisely SDK.
+---
+
+Use `team.analytics.get(query?)` to read team analytics.
+
+```ts
+const team = client.teams.use(teamId)
+
+const analytics = await team.analytics.get({
+  timeframe: '7d',
+  metric: 'token_usage',
+})
+```
+
+The SDK forwards query parameters to:
+
+```
+GET /api/v2/teams/:teamId/analytics
+```

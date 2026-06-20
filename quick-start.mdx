@@ -1,0 +1,61 @@
+---
+title: Quick Start
+description: Get running with the Organisely agent SDK in minutes.
+---
+
+## 1. Install
+
+<CodeGroup>
+
+```bash npm
+npm install @organisely/agent-sdk
+```
+
+```bash pnpm
+pnpm add @organisely/agent-sdk
+```
+
+```bash yarn
+yarn add @organisely/agent-sdk
+```
+
+```bash bun
+bun add @organisely/agent-sdk
+```
+
+</CodeGroup>
+
+## 2. Initialize the client
+
+Start with `OrganiselyAgent` and pass your API key. The SDK is the preferred surface for team-scoped orchestration, event subscriptions, memory, approvals, and connector execution.
+
+```ts
+import { OrganiselyAgent } from '@organisely/agent-sdk'
+
+const client = new OrganiselyAgent({
+  apiKey: process.env.ORGANISELY_API_KEY,
+})
+```
+
+## 3. Define and run an agent
+
+```ts
+const agent = client.define('risk-scan', {
+  model: 'gpt-4.1',
+  provider: 'openai',
+  async handler(event) {
+    await client.memory.set('last-input', event.payload.input)
+  },
+})
+
+await agent.subscribe(['workflow.started'])
+
+const controller = new AbortController()
+await agent.run({ signal: controller.signal })
+```
+
+## Next steps
+
+- [Installation](/installation) — runtime requirements and full setup options
+- [SDK overview](/sdk/overview) — full SDK capabilities
+- [Client configuration](/sdk/client) — constructor options and team scoping

@@ -1,0 +1,46 @@
+---
+title: Installation
+description: Install and configure the Organisely agent SDK.
+---
+
+## Package install
+
+<CodeGroup>
+
+```bash npm
+npm install @organisely/agent-sdk
+```
+
+```bash pnpm
+pnpm add @organisely/agent-sdk
+```
+
+```bash yarn
+yarn add @organisely/agent-sdk
+```
+
+```bash bun
+bun add @organisely/agent-sdk
+```
+
+</CodeGroup>
+
+## Runtime requirements
+
+- Fetch-compatible runtime (Node.js 18+, Deno, Bun, Edge)
+- API base URL
+- Optional bearer API key
+
+## Setup example
+
+```ts
+import { OrganiselyAgent } from '@organisely/agent-sdk'
+
+export const organisely = new OrganiselyAgent({
+  baseUrl: 'https://api.useorganisely.com',
+  apiKey: process.env.ORGANISELY_API_KEY,
+  headers: {
+    'x-request-source': 'platform-console',
+  },
+})
+```

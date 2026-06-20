@@ -1,0 +1,50 @@
+---
+title: API Overview
+description: REST API for teams, workflows, and analytics.
+---
+
+Use the SDK for first-class control from code; use the API directly for custom integrations or admin tooling.
+
+## Authentication
+
+Authenticate with a Bearer token or API key in the `Authorization` header.
+
+```
+Authorization: Bearer <your-api-key>
+```
+
+See [Installation](/installation) for obtaining credentials.
+
+## Teams API
+
+<AccordionGroup>
+  <Accordion title="GET /api/v2/teams">
+    List teams for the authenticated user.
+  </Accordion>
+  <Accordion title="POST /api/v2/teams">
+    Create a new team.
+  </Accordion>
+</AccordionGroup>
+
+## Workflows API
+
+<AccordionGroup>
+  <Accordion title="GET /api/v2/teams/:teamId/workflows">
+    List workflow definitions for a team.
+  </Accordion>
+  <Accordion title="POST /api/v2/teams/:teamId/workflows">
+    Create or start a workflow.
+  </Accordion>
+</AccordionGroup>
+
+## Analytics API
+
+<AccordionGroup>
+  <Accordion title="GET /api/v2/teams/:teamId/analytics">
+    Retrieve analytics for a team.
+  </Accordion>
+</AccordionGroup>
+
+## Compatibility
+
+`GET /api/v2/teams/:teamId/blueprints` and `POST /api/v2/teams/:teamId/blueprints` are maintained as compatibility aliases. Prefer the `workflows` routes for new integrations.

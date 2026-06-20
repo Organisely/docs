@@ -1,0 +1,49 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Organisely",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "favicon": "/logo/light.svg",
+  "colors": {
+    "primary": "#ffffff",
+    "light": "#ffffff",
+    "dark": "#000000"
+  },
+  "topbarLinks": [
+    {
+      "name": "useorganisely.com",
+      "url": "https://useorganisely.com"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "https://useorganisely.com/auth?signup=true"
+  },
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": ["introduction", "quick-start", "installation"]
+    },
+    {
+      "group": "Reference",
+      "pages": ["api", "mcp"]
+    },
+    {
+      "group": "SDK",
+      "pages": [
+        "sdk/overview",
+        "sdk/client",
+        "sdk/teams",
+        "sdk/analytics",
+        "sdk/workflows",
+        "sdk/errors"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/Organisely",
+    "website": "https://useorganisely.com"
+  }
+}

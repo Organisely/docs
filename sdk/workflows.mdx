@@ -1,0 +1,72 @@
+---
+title: Workflows API
+description: Define and execute team workflows with the Organisely SDK.
+---
+
+All workflow calls are team-scoped.
+
+```ts
+const team = client.teams.use(teamId)
+```
+
+## List workflows
+
+```ts
+const listed = await team.workflows.list()
+```
+
+Returns:
+
+- `definitions` — workflow definitions for the team
+- `active_executions` — currently running executions
+
+## Create workflow
+
+```ts
+await team.workflows.create({
+  user_id: '00000000-0000-0000-0000-000000000000',
+  name: 'risk_scan_v1',
+  version: '1.0.0',
+  execution: {
+    allowedTopologies: ['single', 'swarm'],
+    defaultTopology: 'single',
+    escalationPolicy: 'conflict',
+  },
+  steps: [
+    {
+      id: 'step-1',
+      name: 'collect',
+      action: 'collect_context',
+      parameters: {},
+    },
+  ],
+})
+```
+
+## Start workflow execution
+
+```ts
+await team.workflows.start({
+  blueprint_definition_id: '00000000-0000-0000-0000-000000000000',
+  context_data: { source: 'sdk' },
+})
+```
+
+## Current scope
+
+The current SDK workflows surface supports:
+
+- Workflow definition create/list
+- Explicit execution start via `workflows.start`
+
+To control what gets executed, pass routing data in `context_data` and enforce policy/tool access in runtime-side configuration.
+
+## Route aliases
+
+`/api/v2/teams/:teamId/blueprints` is maintained as a compatibility alias. Prefer the `workflows` routes for new integrations.
+
+```ts
+// These are equivalent
+await team.workflows.list()
+await team.blueprints.list()
+```

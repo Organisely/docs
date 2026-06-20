@@ -1,0 +1,72 @@
+---
+title: MCP Overview
+description: Model Context Protocol tools, resources, and real-time events on Organisely.
+---
+
+Organisely provides an **MCP (Model Context Protocol)** SDK for building MCP servers that integrate with the platform: authentication, tools, resources, and real-time events.
+
+## What is MCP?
+
+Model Context Protocol lets AI assistants use your tools, resources, and prompts in a standard way. Organisely's MCP SDK adds auth, loaders, and real-time event emission on top of the protocol.
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card title="Type-safe" icon="shield-check">
+    Full TypeScript support throughout.
+  </Card>
+  <Card title="Authentication" icon="key">
+    Bearer token, OAuth, JWT, and API key auth providers.
+  </Card>
+  <Card title="Tools" icon="wrench">
+    `BaseTool` and `PollableTool`; load from disk with `ToolLoader`.
+  </Card>
+  <Card title="Real-time" icon="bolt">
+    `OrganiselyAppSdk` for emitting real-time events.
+  </Card>
+</CardGroup>
+
+## Quick start
+
+```typescript
+import { MCPServer } from '@organisely/mcp';
+import { BearerTokenAuthProvider } from '@organisely/mcp/auth';
+import { ToolLoader } from '@organisely/mcp/loaders';
+
+const mcpServer = new MCPServer({
+  name: 'my-mcp-server',
+  version: '1.0.0',
+  capabilities: { tools: {}, resources: { subscribe: true, listChanged: true } },
+});
+
+const toolLoader = new ToolLoader();
+const tools = await toolLoader.load('./tools');
+const server = mcpServer.getServer();
+```
+
+## Organisely MCP server
+
+Connect the hosted Organisely MCP server to your AI agent to query SDK docs, search documentation, and get the API overview directly from your agent context.
+
+```bash
+# Claude Code
+claude mcp add organisely https://mcp.useorganisely.com
+```
+
+```json
+// Cursor / Windsurf
+{
+  "mcpServers": {
+    "organisely": { "url": "https://mcp.useorganisely.com" }
+  }
+}
+```
+
+### Available tools
+
+| Tool | Description |
+|---|---|
+| `get_sdk_overview` | Full SDK API surface overview |
+| `search_docs(query)` | Search documentation by keyword |
+| `get_doc_page(slug)` | Read a specific doc page |
+| `list_doc_pages` | List all available doc pages |
