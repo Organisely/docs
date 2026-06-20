@@ -24,11 +24,18 @@
   "navigation": [
     {
       "group": "Getting Started",
-      "pages": ["introduction", "quick-start", "installation"]
+      "pages": [
+        "introduction",
+        "quick-start",
+        "installation"
+      ]
     },
     {
       "group": "Reference",
-      "pages": ["api", "mcp"]
+      "pages": [
+        "api",
+        "mcp"
+      ]
     },
     {
       "group": "SDK",
@@ -45,5 +52,6 @@
   "footerSocials": {
     "github": "https://github.com/Organisely",
     "website": "https://useorganisely.com"
-  }
+  },
+  "url": "https://organisely.mintlify.app"
 }
